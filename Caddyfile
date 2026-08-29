@@ -1,0 +1,39 @@
+# =============================================
+# CONFIGURACIÓN GLOBAL DE CADDY
+# =============================================
+{
+    # Habilita el modo FrankenPHP (procesamiento de PHP integrado)
+    frankenphp
+
+    # Desactiva la obtención automática de certificados HTTPS (entorno local/desarrollo)
+    auto_https off
+
+    # Desactiva la API de administración por seguridad
+    admin off
+}
+
+# =============================================
+# BLOQUE PRINCIPAL DEL SERVIDOR WEB
+# =============================================
+# Escucha en el puerto definido por $PORT, o usa el 10000 por defecto
+:{$PORT:10000} {
+
+    # Define la raíz del documento donde se sirven los archivos públicos
+    root * /app/public
+
+    # Habilita compresión para mejorar el rendimiento (en orden de preferencia)
+    encode zstd br gzip
+
+    # Añade cabeceras de seguridad HTTP
+    header {
+        # Evita que los navegadores hagan sniffing MIME
+        X-Content-Type-Options nosniff
+        # Protege contra ataques de clickjacking
+        X-Frame-Options SAMEORIGIN
+        # Controla la información de referencia enviada
+        Referrer-Policy strict-origin-when-cross-origin
+    }
+
+    # Procesa archivos PHP mediante FrankenPHP (similar a php_fastcgi pero integrado)
+    php_server
+}

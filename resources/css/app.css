@@ -1,0 +1,209 @@
+/* ============================================
+   VARIABLES GLOBALES
+   ============================================ */
+:root {
+  /* Colores base */
+    --color-background: #f4f7fb;
+    --color-border: #dce3ed;
+    --color-muted: #5f6b7a;
+    --color-primary: #1d4ed8;
+    --color-primary-dark: #1e3a8a;
+    --color-surface: #ffffff;
+    --color-text: #172033;
+
+  /* Sombras */
+  --shadow-card: 0 18px 45px rgb(15 23 42 / 8%);
+
+  /* Tipografía */
+  color-scheme: light;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* ============================================
+   RESET Y BASE
+   ============================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+
+  background: var(--color-background);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+}
+
+/* ============================================
+   UTILIDADES DE CONTENEDOR
+   ============================================ */
+.site-header__content,
+.container,
+.site-footer__content {
+  width: min(1120px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+.site-header {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.site-header__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  min-height: 72px;
+  gap: 1rem;
+}
+
+.brand {
+  font-size: 1.1rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.environment {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+/* ============================================
+   CONTENEDOR PRINCIPAL
+   ============================================ */
+.container {
+  padding-block: 4rem;
+}
+
+/* ============================================
+   SECCIÓN HERO
+   ============================================ */
+.hero {
+  padding: clamp(2rem, 6vw, 5rem);
+
+  background: linear-gradient(135deg, rgb(29 78 216 / 96%), rgb(30 58 138 / 96%));
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-card);
+
+  color: white;
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.hero h1 {
+  max-width: 800px;
+  margin: 0;
+
+  font-size: clamp(2.2rem, 7vw, 4.75rem);
+  line-height: 1.05;
+}
+
+.hero__description {
+  max-width: 720px;
+  margin: 1.5rem 0 0;
+
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  opacity: 0.9;
+}
+
+.hero__status {
+  display: inline-flex;
+  margin-top: 2rem;
+  padding: 0.6rem 0.9rem;
+
+  background: rgb(255 255 255 / 12%);
+  border: 1px solid rgb(255 255 255 / 25%);
+  border-radius: 999px;
+
+  font-size: 0.9rem;
+}
+
+/* ============================================
+   SECCIÓN FEATURES (TARJETAS)
+   ============================================ */
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+
+.card {
+  padding: 1.5rem;
+
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-card);
+}
+
+.card h2 {
+  margin-top: 0;
+  font-size: 1.15rem;
+}
+
+.card p {
+  margin-bottom: 0;
+  color: var(--color-muted);
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+.site-footer {
+  padding-block: 2rem;
+
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+
+  color: var(--color-muted);
+}
+
+.site-footer__content {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* ============================================
+   MEDIA QUERIES (RESPONSIVE)
+   ============================================ */
+@media (max-width: 760px) {
+  .features {
+    grid-template-columns: 1fr;
+  }
+
+  .site-header__content,
+  .site-footer__content {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .container {
+    padding-block: 2rem;
+  }
+}

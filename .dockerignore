@@ -1,0 +1,45 @@
+# Ignorar archivos de control de versiones
+.git
+.github
+
+# Archivos de entorno (excepto .env.example)
+.env
+.env.*
+!.env.example
+
+# Archivos de IDE y editores
+.idea
+.vscode
+
+# Dependencias de Node.js
+node_modules
+
+# Directorios de assets compilados y archivos de desarrollo
+public/build
+public/hot
+public/storage
+
+# Directorios de almacenamiento de framework
+storage/*.key
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+
+# Caché de bootstrap
+bootstrap/cache/*.php
+
+# Archivos de base de datos SQLite
+database/*.sqlite
+
+# Archivos de caché de pruebas PHPUnit
+.phpunit.cache
+.phpunit.result.cache
+
+# Logs de npm y yarn
+npm-debug.log
+yarn-error.log
+
+# Archivos de documentación y miscelánea
+README.md
+CONTRIBUTING.md
