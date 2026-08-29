@@ -1,7 +1,7 @@
 services:
   - type: web
     # Cambiar por un nombre único antes de crear el Blueprint.
-    name: webdev-laravel-starter
+    name: GreenCycle/Ivan/Yoel
     runtime: docker
     plan: free
     region: virginia
