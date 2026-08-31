@@ -7,36 +7,25 @@ Este documento resume el avance alcanzado en el Sprint 1, cubriendo los siguient
 
 ## Propósito
 
-Esta aplicación proporciona un entorno inicial para aprender y practicar:
+El objetivo del proyecto es construir una aplicación web bajo arquitectura cliente-servidor que permita a los usuarios autenticarse y administrar sus árboles digitales. En etapas posteriores del desarrollo, se incorporarán las reglas relacionadas con el paso del tiempo: variación de salud, crecimiento, cosecha e inventario. Todo esto se implementará mediante una API REST desarrollada en Laravel, junto con una interfaz de usuario basada en HTML, CSS y JavaScript.
 
-- Arquitectura MVC.
-- Rutas y controladores.
-- Vistas con Blade.
-- Formularios y validación de datos.
-- Eloquent ORM.
-- Migraciones y seeders.
-- Integración con PostgreSQL.
-- Pruebas automatizadas.
-- Control de versiones con Git y GitHub.
-- Integración continua con GitHub Actions.
-- Despliegue de aplicaciones web.
+En este sprint se alcanzaron los siguientes objetivos específicos:
+
+Habilitar el registro y el inicio de sesión de usuarios.
+Diseñar el modelo de datos base (usuarios y árboles) con una estructura flexible que permita, más adelante, incorporar catálogo, inventario y efectos sin necesidad de rediseñar la base de datos.
+Desarrollar una API REST protegida por autenticación, que restrinja las acciones únicamente a los recursos pertenecientes al usuario autenticado.
+Crear una interfaz base capaz de consumir dicha API mediante peticiones Fetch.
+Seguir el patrón de arquitectura MVC apoyándose en Laravel, haciendo uso de migraciones, seeders y el ORM Eloquent.
 
 ## Tecnologías
 
 El proyecto utiliza las siguientes tecnologías:
 
-- PHP 8.5.
-- Laravel 13.
-- Laravel Herd.
-- Blade.
-- CSS.
-- JavaScript.
-- Vite.
-- PostgreSQL en Neon.
-- PHPUnit.
-- Laravel Pint.
-- GitHub Actions.
-- Render.
+Frontend: HTML5 semántico, CSS3 (Flexbox/Grid), JavaScript (ES6+), Fetch API.
+
+Backend: PHP 8.x, Laravel 13, Laravel Sanctum, Blade, Eloquent ORM.
+
+Infraestructura y herramientas: Vite, PostgreSQL (Neon), PHPUnit, Laravel Pint, Git, GitHub, GitHub Actions, Render.
 
 ## Requisitos locales
 
