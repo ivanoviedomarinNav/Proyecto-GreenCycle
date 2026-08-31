@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GreenCycle — Dashboard</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: system-ui, sans-serif;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 16px;
+    background: #f4f6f2;
+    color: #1f2a1f;
+  }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  h2 { font-size: 17px; margin-top: 32px; }
+  .card {
+    background: #fff;
+    border: 1px solid #dde3d9;
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 12px;
+  }
+  label { display: block; font-size: 13px; margin-bottom: 4px; margin-top: 10px; }
+  input, select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #c7cfc2;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  button {
+    margin-top: 14px;
+    padding: 9px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #2f7a3e;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  button:disabled { background: #9bb89f; cursor: not-allowed; }
+  button.secondary { background: #6b7a63; }
+  .error-text { color: #b3261e; font-size: 13px; margin-top: 8px; }
+  .hidden { display: none; }
+  .tree-item {
+    border: 1px solid #dde3d9;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 10px;
+  }
+  .tree-item .estado {
+    display: inline-block;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: #e3efe0;
+    color: #2f7a3e;
+  }
+  .bar-bg {
+    background: #e6e9e2;
+    border-radius: 4px;
+    height: 8px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+  .bar-fill { height: 100%; background: #4a9a5a; }
+  #auth-status { font-size: 13px; color: #4a5a45; }
+  #logout-btn { background: #b3261e; }
+</style>
+</head>
+<body>
+
+<h1>🌱 GreenCycle</h1>
+<div id="auth-status">No has iniciado sesión.</div>
+
+<!-- Auth: login/registro -->
+<section id="auth-section" class="card">
+  <div id="auth-tabs">
+    <button id="tab-login" type="button">Iniciar sesión</button>
+    <button id="tab-register" type="button" class="secondary">Registrarme</button>
+  </div>
+
+  <form id="login-form">
+    <label for="login-email">Correo</label>
+    <input type="email" id="login-email" required>
+    <label for="login-password">Contraseña</label>
+    <input type="password" id="login-password" required>
+    <button type="submit" id="login-btn">Entrar</button>
+    <div class="error-text hidden" id="login-error"></div>
+  </form>
+
+  <form id="register-form" class="hidden">
+    <label for="reg-name">Nombre</label>
+    <input type="text" id="reg-name" required>
+    <label for="reg-email">Correo</label>
+    <input type="email" id="reg-email" required>
+    <label for="reg-password">Contraseña</label>
+    <input type="password" id="reg-password" required>
+    <label for="reg-password-confirm">Confirmar contraseña</label>
+    <input type="password" id="reg-password-confirm" required>
+    <button type="submit" id="register-btn">Crear cuenta</button>
+    <div class="error-text hidden" id="register-error"></div>
+  </form>
+</section>
+
+<!-- Panel principal (solo visible autenticado) -->
+<section id="app-section" class="hidden">
+  <button id="logout-btn" type="button">Cerrar sesión</button>
+
+  <h2>Plantar un árbol</h2>
+  <div class="card">
+    <label for="seed-type">Tipo de semilla (ID)</label>
+    <input type="number" id="seed-type" min="1" value="1">
+    <button type="submit" id="plant-btn" form="plant-form">Plantar</button>
+    <form id="plant-form"></form>
+    <div class="error-text hidden" id="plant-error"></div>
+  </div>
+
+  <h2>Mis árboles</h2>
+  <div class="card">
+    <div id="trees-loading">Cargando árboles...</div>
+    <div id="trees-empty" class="hidden">Todavía no tienes árboles. ¡Planta el primero!</div>
+    <div id="trees-error" class="error-text hidden"></div>
+    <div id="trees-list"></div>
+  </div>
+</section>
+
+<script>
+const API_BASE = '/api';
+
+function getToken() {
+  return localStorage.getItem('gc_token');
+}
+function setToken(token) {
+  localStorage.setItem('gc_token', token);
+}
+function clearToken() {
+  localStorage.removeItem('gc_token');
+}
+
+async function apiFetch(path, options = {}) {
+  const token = getToken();
+  const res = await fetch(API_BASE + path, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers,
+    },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const message = data.message || 'Ocurrió un error inesperado.';
+    throw new Error(message);
+  }
+  return data;
+}
+
+// --- Referencias del DOM ---
+const authStatus = document.getElementById('auth-status');
+const authSection = document.getElementById('auth-section');
+const appSection = document.getElementById('app-section');
+
+const tabLogin = document.getElementById('tab-login');
+const tabRegister = document.getElementById('tab-register');
+const loginForm = document.getElementById('login-form');
+const registerForm = document.getElementById('register-form');
+const loginError = document.getElementById('login-error');
+const registerError = document.getElementById('register-error');
+const loginBtn = document.getElementById('login-btn');
+const registerBtn = document.getElementById('register-btn');
+
+const logoutBtn = document.getElementById('logout-btn');
+const plantForm = document.getElementById('plant-form');
+const plantBtn = document.getElementById('plant-btn');
+const plantError = document.getElementById('plant-error');
+const seedTypeInput = document.getElementById('seed-type');
+
+const treesLoading = document.getElementById('trees-loading');
+const treesEmpty = document.getElementById('trees-empty');
+const treesErrorEl = document.getElementById('trees-error');
+const treesList = document.getElementById('trees-list');
+
+// --- Tabs login/registro ---
+tabLogin.addEventListener('click', () => {
+  loginForm.classList.remove('hidden');
+  registerForm.classList.add('hidden');
+});
+tabRegister.addEventListener('click', () => {
+  registerForm.classList.remove('hidden');
+  loginForm.classList.add('hidden');
+});
+
+// --- Login ---
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  loginError.classList.add('hidden');
+  loginBtn.disabled = true;
+  loginBtn.textContent = 'Entrando...';
+
+  try {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    const data = await apiFetch('/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+    setToken(data.token);
+    await showApp(data.user);
+  } catch (err) {
+    loginError.textContent = err.message;
+    loginError.classList.remove('hidden');
+  } finally {
+    loginBtn.disabled = false;
+    loginBtn.textContent = 'Entrar';
+  }
+});
+
+// --- Registro ---
+registerForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  registerError.classList.add('hidden');
+  registerBtn.disabled = true;
+  registerBtn.textContent = 'Creando...';
+
+  try {
+    const name = document.getElementById('reg-name').value;
+    const email = document.getElementById('reg-email').value;
+    const password = document.getElementById('reg-password').value;
+    const password_confirmation = document.getElementById('reg-password-confirm').value;
+
+    const data = await apiFetch('/register', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, password, password_confirmation }),
+    });
+    setToken(data.token);
+    await showApp(data.user);
+  } catch (err) {
+    registerError.textContent = err.message;
+    registerError.classList.remove('hidden');
+  } finally {
+    registerBtn.disabled = false;
+    registerBtn.textContent = 'Crear cuenta';
+  }
+});
+
+// --- Logout ---
+logoutBtn.addEventListener('click', async () => {
+  try {
+    await apiFetch('/logout', { method: 'POST' });
+  } catch (_) {
+    // aunque falle en el servidor, limpiamos el estado local igual
+  }
+  clearToken();
+  showAuth();
+});
+
+// --- Plantar árbol ---
+plantForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+});
+plantBtn.addEventListener('click', async () => {
+  plantError.classList.add('hidden');
+  plantBtn.disabled = true;
+  plantBtn.textContent = 'Plantando...';
+
+  try {
+    const seed_type_id = Number(seedTypeInput.value);
+    await apiFetch('/trees', {
+      method: 'POST',
+      body: JSON.stringify({ seed_type_id }),
+    });
+    await loadTrees();
+  } catch (err) {
+    plantError.textContent = err.message;
+    plantError.classList.remove('hidden');
+  } finally {
+    plantBtn.disabled = false;
+    plantBtn.textContent = 'Plantar';
+  }
+});
+
+// --- Cargar árboles ---
+async function loadTrees() {
+  treesLoading.classList.remove('hidden');
+  treesEmpty.classList.add('hidden');
+  treesErrorEl.classList.add('hidden');
+  treesList.innerHTML = '';
+
+  try {
+    const trees = await apiFetch('/trees');
+    treesLoading.classList.add('hidden');
+
+    if (trees.length === 0) {
+      treesEmpty.classList.remove('hidden');
+      return;
+    }
+
+    trees.forEach(renderTree);
+  } catch (err) {
+    treesLoading.classList.add('hidden');
+    treesErrorEl.textContent = err.message;
+    treesErrorEl.classList.remove('hidden');
+  }
+}
+
+function renderTree(tree) {
+  const div = document.createElement('div');
+  div.className = 'tree-item';
+  div.innerHTML = `
+    <strong>${tree.seed_type?.name ?? 'Árbol'}</strong>
+    <span class="estado">${tree.estado}</span>
+    <div>Nivel ${tree.nivel} · Salud ${tree.salud}/100 · Progreso ${tree.progreso}</div>
+    <div class="bar-bg"><div class="bar-fill" style="width:${tree.salud}%"></div></div>
+  `;
+  treesList.appendChild(div);
+}
+
+// --- Cambiar entre vista de auth y vista de app ---
+async function showApp(user) {
+  authSection.classList.add('hidden');
+  appSection.classList.remove('hidden');
+  authStatus.textContent = `Sesión iniciada como ${user.name}`;
+  await loadTrees();
+}
+
+function showAuth() {
+  authSection.classList.remove('hidden');
+  appSection.classList.add('hidden');
+  authStatus.textContent = 'No has iniciado sesión.';
+}
+
+// --- Al cargar la página: si hay token, intenta recuperar sesión ---
+(async function init() {
+  const token = getToken();
+  if (!token) {
+    showAuth();
+    return;
+  }
+  try {
+    const user = await apiFetch('/me');
+    await showApp(user);
+  } catch (_) {
+    clearToken();
+    showAuth();
+  }
+})();
+</script>
+</body>
+</html>
