@@ -255,10 +255,10 @@ URL_DE_NEON_DEVELOPMENT
 
 por la cadena de conexión de la base de datos de desarrollo en Neon.
 
-#Usuario de Prueba
+# Usuario de Prueba
 UsuarioPr / UsuarioPrueba@gmail.com / Prueba123
-#Equipo y Detalles
+# Equipo y Detalles
 - Yoel Gonzales Gonzales - Ivan Oviedo Marin
 
-#Estado del Proyecto
+# Estado del Proyecto
 Sprint numero 1
