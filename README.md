@@ -1,6 +1,9 @@
 # Web Development Laravel Starter
 
 Proyecto base para el curso **TM4100**, preparado para desarrollar aplicaciones web con Laravel en un entorno reproducible.
+GreenCycle es un proyecto de curso que como objetivo tiene crear un sistema web en el que los usuarios podrán crear un ecosistema virtual donde el principal objetivo es hacer crecer un árbol, el usuario podrá cuidar una variedad de arboles que crecerán dependiente del tiempo que transcurra, como se cuiden y de la atención que se le administre ademas de como usemos los objetos con estos arboles, si los arboles no se cuidan estos pueden morir pero si al contrario un árbol consigue el nivel máximo este empezara a dar frutos, los cuales son monedas para utilizar en la tienda.
+
+Este documento resume el avance alcanzado en el Sprint 1, cubriendo los siguientes componentes: el sistema de autenticación de usuarios, el diseño del modelo de datos, la API inicial para la gestión de árboles y la interfaz base del proyecto.
 
 ## Propósito
 
