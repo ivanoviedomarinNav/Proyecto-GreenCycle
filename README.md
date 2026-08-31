@@ -236,22 +236,6 @@ git push -u origin feature/nombre-de-la-funcionalidad
 git switch main
 git pull origin main
 ```
-## Funcionalidades del Sprint
-Alcance actual: hasta el momento, la aplicación cubre las funciones esenciales de registro e inicio de sesión, siembra de árboles, y consulta tanto del listado como del detalle individual de los árboles pertenecientes a cada usuario. Se dejó lista la estructura inicial del modelo de datos, junto con sus relaciones y los seeders correspondientes. Aspectos como las reglas basadas en tiempo (cuidados, cooldown, deterioro), así como la economía del juego y el sistema de inventario, quedan planificados para sprints posteriores.
-
-Lo desarrollado hasta ahora incluye:
-
-Registro de nuevos usuarios.
-Manejo de sesión (inicio y cierre) a través de Laravel Sanctum.
-Endpoints y rutas privadas con protección de acceso.
-Estructura inicial del modelo de datos (usuarios, árboles y tipos de semilla).
-Migraciones y seeders que permiten reproducir el entorno de datos.
-Control de autorización basado en propiedad, de modo que cada usuario únicamente puede ver o modificar sus propios árboles.
-Endpoint para la creación de árboles (POST /api/trees).
-Endpoint para obtener el listado de árboles del usuario.
-Endpoint para consultar el detalle de un árbol específico.
-Panel inicial (dashboard) que permite registrarse, iniciar sesión, plantar árboles y visualizarlos.
-Conexión entre frontend y backend mediante Fetch API, contemplando los distintos estados de la interfaz (cargando, éxito, error y vacío) sin necesidad de recargar la página por completo.
 
 ## Configuración pendiente
 
@@ -270,6 +254,22 @@ URL_DE_NEON_DEVELOPMENT
 ```
 
 por la cadena de conexión de la base de datos de desarrollo en Neon.
+## Funcionalidades del Sprint
+Alcance actual: hasta el momento, la aplicación cubre las funciones esenciales de registro e inicio de sesión, siembra de árboles, y consulta tanto del listado como del detalle individual de los árboles pertenecientes a cada usuario. Se dejó lista la estructura inicial del modelo de datos, junto con sus relaciones y los seeders correspondientes. Aspectos como las reglas basadas en tiempo (cuidados, cooldown, deterioro), así como la economía del juego y el sistema de inventario, quedan planificados para sprints posteriores.
+
+Lo desarrollado hasta ahora incluye:
+
+Registro de nuevos usuarios.
+Manejo de sesión (inicio y cierre) a través de Laravel Sanctum.
+Endpoints y rutas privadas con protección de acceso.
+Estructura inicial del modelo de datos (usuarios, árboles y tipos de semilla).
+Migraciones y seeders que permiten reproducir el entorno de datos.
+Control de autorización basado en propiedad, de modo que cada usuario únicamente puede ver o modificar sus propios árboles.
+Endpoint para la creación de árboles (POST /api/trees).
+Endpoint para obtener el listado de árboles del usuario.
+Endpoint para consultar el detalle de un árbol específico.
+Panel inicial (dashboard) que permite registrarse, iniciar sesión, plantar árboles y visualizarlos.
+Conexión entre frontend y backend mediante Fetch API, contemplando los distintos estados de la interfaz (cargando, éxito, error y vacío) sin necesidad de recargar la página por completo.
 
 ## Usuario de Prueba
 UsuarioPr / UsuarioPrueba@gmail.com / Prueba123
