@@ -255,8 +255,8 @@ URL_DE_NEON_DEVELOPMENT
 
 por la cadena de conexión de la base de datos de desarrollo en Neon.
 
+#Equipo y Detalles
+- Yoel Gonzales Gonzales - Ivan Oviedo Marin
 
-## Estado del proyecto
-El repositorio utiliza GitHub Actions para validar pruebas, formato y recursos frontend.
-=======
-<!-- branch protection test -->
+#Estado del Proyecto
+Sprint numero 1
