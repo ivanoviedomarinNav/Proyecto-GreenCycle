@@ -4,7 +4,7 @@ Proyecto base para el curso **TM4100**, preparado para desarrollar aplicaciones 
 GreenCycle es un proyecto de curso que como objetivo tiene crear un sistema web en el que los usuarios podrán crear un ecosistema virtual donde el principal objetivo es hacer crecer un árbol, el usuario podrá cuidar una variedad de arboles que crecerán dependiente del tiempo que transcurra, como se cuiden y de la atención que se le administre ademas de como usemos los objetos con estos arboles, si los arboles no se cuidan estos pueden morir pero si al contrario un árbol consigue el nivel máximo este empezara a dar frutos, los cuales son monedas para utilizar en la tienda.
 
 Este documento resume el avance alcanzado en el Sprint 1, cubriendo los siguientes componentes: el sistema de autenticación de usuarios, el diseño del modelo de datos, la API inicial para la gestión de árboles y la interfaz base del proyecto, en este sprint se alcanzaron los siguientes objetivos específicos:
-
+#Proposito
 Habilitar el registro y el inicio de sesión de usuarios.
 Diseñar el modelo de datos base (usuarios y árboles) con una estructura flexible que permita, más adelante, incorporar catálogo, inventario y efectos sin necesidad de rediseñar la base de datos.
 Desarrollar una API REST protegida por autenticación, que restrinja las acciones únicamente a los recursos pertenecientes al usuario autenticado.
