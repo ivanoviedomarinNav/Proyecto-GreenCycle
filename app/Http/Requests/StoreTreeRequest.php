@@ -8,7 +8,7 @@ class StoreTreeRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // la autenticación ya la exige el middleware de la ruta
+        return true; 
     }
 
     public function rules(): array
