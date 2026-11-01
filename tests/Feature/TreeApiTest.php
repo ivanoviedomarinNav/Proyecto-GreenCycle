@@ -53,10 +53,10 @@ class TreeApiTest extends TestCase
 
         $response
             ->assertCreated()
-            ->assertJsonPath('nivel', 0)
-            ->assertJsonPath('salud', 100)
-            ->assertJsonPath('progreso', 0)
-            ->assertJsonPath('estado', Tree::ACTIVE)
+            ->assertJsonPath('level', 0)
+            ->assertJsonPath('health', 100)
+            ->assertJsonPath('progress', 0)
+            ->assertJsonPath('status', Tree::ACTIVE)
             ->assertJsonPath('seed_type.name', 'Árbol básico');
 
         $this->assertDatabaseHas('trees', ['user_id' => $user->id, 'seed_type_id' => $seedType->id]);
@@ -76,11 +76,15 @@ class TreeApiTest extends TestCase
             'salud' => 1,
             'progreso' => 4,
             'estado' => Tree::MATURE,
+            'level' => 10,
+            'health' => 1,
+            'progress' => 4,
+            'status' => Tree::MATURE,
         ])->assertCreated()
-            ->assertJsonPath('nivel', 0)
-            ->assertJsonPath('salud', 100)
-            ->assertJsonPath('progreso', 0)
-            ->assertJsonPath('estado', Tree::ACTIVE);
+            ->assertJsonPath('level', 0)
+            ->assertJsonPath('health', 100)
+            ->assertJsonPath('progress', 0)
+            ->assertJsonPath('status', Tree::ACTIVE);
 
         $this->assertDatabaseHas('trees', ['user_id' => $user->id, 'estado' => Tree::ACTIVE]);
         $this->assertDatabaseMissing('trees', ['user_id' => $other->id]);
@@ -146,7 +150,7 @@ class TreeApiTest extends TestCase
 
         $this->getJson('/api/trees/'.$tree->id)
             ->assertForbidden()
-            ->assertJsonMissingPath('nivel');
+            ->assertJsonMissingPath('level');
     }
 
     public function test_show_returns_404_for_a_missing_tree(): void

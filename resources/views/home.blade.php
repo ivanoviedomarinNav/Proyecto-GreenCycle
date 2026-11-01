@@ -214,7 +214,7 @@ async function cargarArboles() {
     status.textContent = trees.length === 0 ? 'Aún no tienes árboles.' : '';
     trees.forEach((t) => {
       const li = document.createElement('li');
-      li.textContent = `${t.seed_type?.name ?? 'Árbol'} — Nivel ${t.nivel} — Salud ${t.salud} — Estado ${t.estado} `;
+      li.textContent = `${t.seed_type?.name ?? 'Árbol'} — Nivel ${t.level} — Salud ${t.health} — Estado ${t.status} `;
 
       const btn = document.createElement('button');
       btn.type = 'button';
@@ -244,10 +244,10 @@ async function verDetalle(id) {
     status.textContent = '';
     content.textContent =
       `Tipo: ${t.seed_type?.name ?? '-'}\n` +
-      `Nivel: ${t.nivel}\n` +
-      `Salud: ${t.salud}\n` +
-      `Progreso: ${t.progreso}\n` +
-      `Estado: ${t.estado}`;
+      `Nivel: ${t.level}\n` +
+      `Salud: ${t.health}\n` +
+      `Progreso: ${t.progress}\n` +
+      `Estado: ${t.status}`;
   } catch (err) {
     if (err.status === 401) {
       return sesionExpirada();

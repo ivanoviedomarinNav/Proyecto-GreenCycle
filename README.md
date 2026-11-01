@@ -276,7 +276,7 @@ Se crea automáticamente con `php artisan migrate --seed` (seeder `DemoUserSeede
 - Yoel Gonzales Gonzales - Ivan Oviedo Marin
 
 ## Estado del Proyecto
-Sprint numero 1
+Sprint 2: lógica de cuidado, niveles, estados y cooldown en el backend
 
 ## Versión evaluada del Sprint 1
 
@@ -298,6 +298,7 @@ git checkout sprint-1-final
 | GET | `/api/trees` | Sí | Lista los árboles propios | 200, 401 |
 | GET | `/api/trees/{tree}` | Sí | Detalle de un árbol propio | 200, 401, 403, 404 |
 | POST | `/api/trees` | Sí | Planta un árbol (solo recibe `seed_type_id`) | 201, 401, 422 |
+| POST | `/api/trees/{tree}/care` | Sí | Cuida un árbol propio (Sprint 2) | 200, 401, 403, 404, 409 |
 
 Las respuestas de árboles pasan por `TreeResource`, que define en un único lugar los atributos expuestos. Nivel, salud, progreso, estado y fechas los fija siempre el servidor.
 
@@ -349,4 +350,94 @@ php artisan test
 ```
 
 Cubren autenticación (registro, login, logout, `me`), autorización por propiedad, creación de árboles con valores definidos por el servidor, validaciones, página de inicio y seeders repetibles.
+
+## Sprint 2: cuidado de árboles
+
+El cuidado se aplica por completo en el servidor (`TreeCareService`); el cliente no envía ningún dato que influya en el resultado. Esta entrega es solo de backend, sin consumo desde el frontend ni Scheduler.
+
+### Endpoint
+
+`POST /api/trees/{tree}/care` valida en este orden:
+
+1. **Propiedad:** el árbol debe ser del usuario autenticado (`TreePolicy::care`), si no, **403**.
+2. **Estado:** solo un árbol `ACTIVE` puede recibir cuidados. En `DEAD`, `MATURE` o `HARVESTED`, **409**.
+3. **Cooldown:** si `now() < next_care_at`, **409** con la fecha en que se podrá cuidar de nuevo.
+4. **Cuidado:** si todo es válido, se aplican las reglas y se responde **200**.
+
+Reglas de un cuidado válido:
+
+| Regla | Valor |
+|---|---|
+| Progreso | +1 por cuidado |
+| Salud | +20, sin superar 100 |
+| Subida de nivel | Al completar los cuidados del tipo de semilla (5 en el árbol básico, 3 en la semilla especial): nivel +1 y progreso vuelve a 0 |
+| Madurez | Al llegar al nivel 10 el estado pasa a `MATURE` |
+| Cooldown | `next_care_at = now() + 60 minutos` |
+
+### Contrato JSON
+
+La representación de un árbol (`TreeResource`) usa las claves `id`, `seed_type`, `level`, `health`, `progress`, `status`, `last_cared_at`, `next_care_at`, `harvested_at` y `created_at`. Las fechas se devuelven en UTC (por ejemplo `2026-10-18T09:22:00Z`).
+
+Cuidado exitoso (200):
+
+```json
+{
+  "message": "Cuidado aplicado con éxito",
+  "tree": {
+    "id": 1,
+    "level": 1,
+    "health": 100,
+    "progress": 0,
+    "status": "ACTIVE",
+    "next_care_at": "2026-10-18T09:22:00Z"
+  }
+}
+```
+
+Cooldown activo (409):
+
+```json
+{
+  "error": "El árbol se encuentra en período de enfriamiento.",
+  "code": "TREE_ON_COOLDOWN",
+  "next_care_at": "2026-10-18T09:22:00Z"
+}
+```
+
+Estado terminal (409):
+
+```json
+{
+  "error": "El árbol está muerto y ya no puede recibir cuidados.",
+  "code": "TREE_NOT_CAREABLE",
+  "status": "DEAD"
+}
+```
+
+| Código HTTP | Cuándo |
+|---|---|
+| 200 | Cuidado aplicado |
+| 401 | Sin token válido |
+| 403 | El árbol pertenece a otro usuario |
+| 404 | El árbol no existe |
+| 409 | Árbol en estado terminal o en cooldown |
+
+### Decisiones de diseño
+
+- **Concurrencia:** el servicio ejecuta el cuidado dentro de una transacción y bloquea la fila del árbol (`lockForUpdate`), de modo que dos solicitudes simultáneas no aplican el mismo cuidado dos veces.
+- **Reglas configurables:** `config/greencycle.php` agrupa nivel máximo, salud máxima, salud por cuidado y duración del cooldown. Para demostraciones se puede acortar con `GREENCYCLE_CARE_COOLDOWN_MINUTES` en el `.env`.
+- **Errores del dominio:** `TreeOnCooldownException` y `TreeNotCarableException` se renderizan solas como JSON 409 y no se registran en el log, porque son errores esperados.
+- **Nombres:** la base de datos conserva las columnas en español (`nivel`, `salud`, `progreso`, `estado`); el API las expone como `level`, `health`, `progress` y `status`.
+
+### Pruebas del Sprint 2
+
+```powershell
+php artisan test --filter=TreeCareTest
+```
+
+`tests/Feature/TreeCareTest.php` cubre: cuidado exitoso, recuperación de salud con tope en 100, bloqueo por cooldown sin modificar datos, ascenso de nivel tras 5 cuidados, evolución a `MATURE`, estados terminales (`DEAD`, `MATURE`, `HARVESTED`), recursos de otro usuario (403), usuario sin sesión (401), árbol inexistente (404) y valores del cliente ignorados.
+
+## Versión evaluada del Sprint 2
+
+La entrega del Sprint 2 corresponde al tag **`sprint-2-final`**.
 
