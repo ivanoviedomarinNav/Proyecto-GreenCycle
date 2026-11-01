@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->unsignedInteger('cost');
-            $table->string('effect_type'); // ej: 'accelerator', 'auto_water'
+            $table->string('effect_type'); 
             $table->unsignedInteger('duration_minutes')->nullable();
             $table->timestamps();
         });
