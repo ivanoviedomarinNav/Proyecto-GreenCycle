@@ -14,4 +14,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/trees', [TreeController::class, 'index']);
     Route::get('/trees/{tree}', [TreeController::class, 'show']);
     Route::post('/trees', [TreeController::class, 'store']);
+    Route::post('/trees/{tree}/care', [TreeController::class, 'care']);
 });
