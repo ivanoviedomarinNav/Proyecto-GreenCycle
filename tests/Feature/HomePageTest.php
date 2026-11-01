@@ -2,19 +2,20 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class HomePageTest extends TestCase
 {
     /**
-     * A basic test example.
+     * La ruta raíz sirve el dashboard de GreenCycle (login, registro y árboles).
      */
     public function test_home_page_is_available(): void
     {
         $response = $this->get(route('home'));
+
         $response
             ->assertOk()
-            ->assertSee('Desarrollo backend con Laravel');
+            ->assertSee('GreenCycle')
+            ->assertSee('Iniciar sesión');
     }
 }

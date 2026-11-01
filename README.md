@@ -45,8 +45,8 @@ Antes de instalar el proyecto, asegúrese de contar con:
 Abra PowerShell y ejecute:
 
 ```powershell
-git clone URL_DEL_REPOSITORIO
-Set-Location webdev-laravel-starter
+git clone https://github.com/ivanoviedomarinNav/Proyecto-GreenCycle.git
+Set-Location Proyecto-GreenCycle
 ```
 
 ### 2. Aplicar la configuración de Laravel Herd
@@ -129,7 +129,7 @@ Mantenga esta terminal abierta mientras desarrolla la aplicación.
 Visite la siguiente dirección en el navegador:
 
 ```text
-http://webdev-laravel-starter.test
+http://proyecto-greencycle.test
 ```
 
 ## Comprobaciones del proyecto
@@ -239,15 +239,7 @@ git pull origin main
 
 ## Configuración pendiente
 
-Antes de distribuir el proyecto, sustituya:
-
-```text
-URL_DEL_REPOSITORIO
-```
-
-por la URL real del repositorio en GitHub.
-
-También debe sustituir:
+Antes de ejecutar el proyecto, sustituya:
 
 ```text
 URL_DE_NEON_DEVELOPMENT
@@ -272,9 +264,89 @@ Panel inicial (dashboard) que permite registrarse, iniciar sesión, plantar árb
 Conexión entre frontend y backend mediante Fetch API, contemplando los distintos estados de la interfaz (cargando, éxito, error y vacío) sin necesidad de recargar la página por completo.
 
 ## Usuario de Prueba
-UsuarioPr / UsuarioPrueba@gmail.com / Prueba123
+
+Se crea automáticamente con `php artisan migrate --seed` (seeder `DemoUserSeeder`, repetible sin duplicar datos).
+
+| Nombre | Correo | Contraseña |
+|---|---|---|
+| UsuarioPr | UsuarioPrueba@gmail.com | Prueba123 |
+
+> El correo distingue mayúsculas y minúsculas: escríbalo tal como aparece.
 ## Equipo y Detalles
 - Yoel Gonzales Gonzales - Ivan Oviedo Marin
 
 ## Estado del Proyecto
 Sprint numero 1
+
+## Versión evaluada del Sprint 1
+
+La entrega del Sprint 1 corresponde al tag **`sprint-1-final`**. Para abrir exactamente esa versión:
+
+```powershell
+git fetch --tags
+git checkout sprint-1-final
+```
+
+## Endpoints del Sprint 1
+
+| Método | Ruta | Auth | Descripción | Códigos |
+|---|---|---|---|---|
+| POST | `/api/register` | No | Crea la cuenta y devuelve token | 201, 422 |
+| POST | `/api/login` | No | Inicia sesión y devuelve token | 200, 422 |
+| POST | `/api/logout` | Sí | Revoca el token actual | 200, 401 |
+| GET | `/api/me` | Sí | Usuario autenticado | 200, 401 |
+| GET | `/api/trees` | Sí | Lista los árboles propios | 200, 401 |
+| GET | `/api/trees/{tree}` | Sí | Detalle de un árbol propio | 200, 401, 403, 404 |
+| POST | `/api/trees` | Sí | Planta un árbol (solo recibe `seed_type_id`) | 201, 401, 422 |
+
+Las respuestas de árboles pasan por `TreeResource`, que define en un único lugar los atributos expuestos. Nivel, salud, progreso, estado y fechas los fija siempre el servidor.
+
+## Estados de la interfaz y flujo Fetch
+
+El dashboard (ruta `/`, vista `resources/views/home.blade.php`) consume el API con Fetch, sin recargar la página.
+
+| Acción | Antes | Durante | Éxito | Error |
+|---|---|---|---|---|
+| `GET /api/trees` | — | "Cargando..." | Lista de árboles | Vacío: "Aún no tienes árboles." · Error: mensaje · 401: vuelve al login |
+| `GET /api/trees/{tree}` | "Selecciona un árbol para ver su detalle." | "Cargando detalle..." | Tipo, nivel, salud, progreso y estado | 403: "No tienes permiso para ver este árbol." · 404: "El árbol no existe." · otro: "No se pudo cargar el detalle." |
+| `POST /api/trees` | Formulario habilitado | Botón deshabilitado ("Plantando...") | "Árbol plantado." y lista actualizada | Mensaje bajo el formulario (422/401) |
+| `POST /api/login` | Formulario | Botón deshabilitado ("Entrando...") | Pasa a la vista de árboles | Mensaje de error |
+| `POST /api/register` | Formulario | Botón deshabilitado ("Creando...") | Pasa a la vista de árboles | Mensaje de error |
+| `POST /api/logout` | Sesión activa | — | Vuelve al login | Limpia el token local igualmente |
+
+## Integridad de datos
+
+Además de las validaciones del API, la base de datos (PostgreSQL) protege las reglas críticas con restricciones (migración `harden_sprint1_schema`):
+
+| Tabla | Restricción |
+|---|---|
+| `inventories` | `UNIQUE(user_id, item_id)` y `CHECK (quantity >= 0)` |
+| `users` | `CHECK (coins >= 0)` |
+| `items` | `CHECK (cost >= 0)` |
+| `trees` | `CHECK (salud BETWEEN 0 AND 100)`, `CHECK (nivel BETWEEN 0 AND 10)`, `CHECK (progreso >= 0)` y `CHECK (estado IN ('ACTIVE','MATURE','DEAD','HARVESTED'))` |
+| `active_effects` | Índice `(tree_id, item_id, expires_at)` para consultar efectos vigentes |
+
+> Los `CHECK` y los cambios de llaves foráneas solo se aplican en PostgreSQL; las pruebas (SQLite en memoria) se saltan esa parte.
+
+### Estrategia para impedir efectos activos duplicados (Sprint 3)
+
+Al activar un efecto (por ejemplo, el acelerador) se ejecutará dentro de `DB::transaction`:
+
+1. Bloquear la fila del árbol con `lockForUpdate()`.
+2. Comprobar que no exista un efecto del mismo ítem para ese árbol con `expires_at > now()`.
+3. Insertar el efecto solo si no existe.
+
+Así, dos solicitudes repetidas o simultáneas no crean dos efectos equivalentes ni consumen dos unidades del inventario.
+
+## Política de borrado de cuentas e historial
+
+Actualmente no existe eliminación de usuarios. Para conservar el historial de árboles `DEAD` y `HARVESTED` y de compras, las llaves foráneas `trees.user_id` y `purchases.user_id` usan `restrictOnDelete`: un usuario con historial no puede borrarse. Si en el futuro se agrega la eliminación de cuentas, se usará anonimización o *soft delete* en lugar de borrado en cascada.
+
+## Pruebas automatizadas
+
+```powershell
+php artisan test
+```
+
+Cubren autenticación (registro, login, logout, `me`), autorización por propiedad, creación de árboles con valores definidos por el servidor, validaciones, página de inicio y seeders repetibles.
+
