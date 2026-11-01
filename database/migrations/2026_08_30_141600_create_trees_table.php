@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('nivel')->default(0);
             $table->unsignedTinyInteger('salud')->default(100);
             $table->unsignedTinyInteger('progreso')->default(0);
-            $table->string('estado')->default('ACTIVE'); // ACTIVE | MATURE | DEAD | HARVESTED
+            $table->string('estado')->default('ACTIVE'); 
 
             $table->timestamp('last_cared_at')->nullable();
             $table->timestamp('next_care_at')->nullable();
